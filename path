@@ -7,7 +7,7 @@ if [ -z "$spip" ] || [ -z "$spport" ]; then
     exit 1
 fi
 
-userid=$(echo $RANDOM | md5sum | cut -c 1-22)
+userid="2cafa8b81f499d13f02d6d80f3800cee"
 md5="0c64df413788e2a2134ce986c785424e"
 spkey=$(echo -n "if5ax/?userid=$userid&spid=31117&pid=8031006300&portalid=604&spip=$spip&spport=$spport$md5" | md5sum | cut -d " " -f1)
 
