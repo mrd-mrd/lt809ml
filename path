@@ -11,12 +11,16 @@ userid=$(echo $RANDOM | md5sum | cut -c 1-22)
 md5="0c64df413788e2a2134ce986c785424e"
 spkey=$(echo -n "if5ax/?userid=$userid&spid=31117&pid=8031006300&portalid=604&spip=$spip&spport=$spport$md5" | md5sum | cut -d " " -f1)
 
+# 保存API接口链接以便在错误时展示
+api_url="http://dir.wo186.tv:809/if5ax/?userid=$userid&spid=31117&pid=8031006300&portalid=604&spip=$spip&spport=$spport&spkey=$spkey"
+
 # 保存完整响应以便错误分析
-response=$(curl -s -X GET -H "Host:dir.wo186.tv:809" -H "User-Agent:Mozilla/5.0 (Linux; Android 11; M2012K11AC) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.104 Mobile Safari/537.36" "http://dir.wo186.tv:809/if5ax/?userid=$userid&spid=31117&pid=8031006300&portalid=604&spip=$spip&spport=$spport&spkey=$spkey")
+response=$(curl -s -X GET -H "Host:dir.wo186.tv:809" -H "User-Agent:Mozilla/5.0 (Linux; Android 11; M2012K11AC) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.104 Mobile Safari/537.36" "$api_url")
 
 # 检查curl是否成功执行
 if [ $? -ne 0 ]; then
     echo "错误: 网络请求失败，请检查网络连接"
+    echo "API接口: $api_url"
     exit 1
 fi
 
@@ -24,6 +28,7 @@ fi
 if ! echo "$response" | grep -q "url"; then
     echo "错误: 服务器响应中没有找到URL"
     echo "服务器响应: $response"
+    echo "API接口: $api_url"
     exit 1
 fi
 
@@ -33,6 +38,7 @@ url=$(echo "$response" | grep -o "url.*" | cut -d '"' -f3 | sed 's/\\//g')
 if [ -z "$url" ]; then
     echo "错误: 获取到的URL为空"
     echo "服务器响应: $response"
+    echo "API接口: $api_url"
     exit 1
 fi
 
@@ -43,12 +49,14 @@ path=$(echo $url | grep -o "/if5ax.*")
 if [ -z "$host" ]; then
     echo "错误: 无法从URL中提取host"
     echo "获取的URL: $url"
+    echo "API接口: $api_url"
     exit 1
 fi
 
 if [ -z "$path" ]; then
     echo "错误: 无法从URL中提取path"
     echo "获取的URL: $url"
+    echo "API接口: $api_url"
     exit 1
 fi
 
